@@ -79,7 +79,13 @@ module.exports = function(grunt) {
 
     shell: {
       prodServer: {
-        command: 'git push azure master'
+        command: 'git push azure master',
+        options: {
+          callback: function (err, stdout, stderr, cb) {
+            console.log(stdout);
+            cb();
+          }
+        }
       }
     }
   });
