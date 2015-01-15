@@ -43,7 +43,6 @@ module.exports = function(grunt) {
     jshint: {
       files: ['Gruntfile.js', 'public/client/*.js'],
       options: {
-        force: 'true',
         jshintrc: '.jshintrc',
         ignores: [
           'public/lib/**/*.js',
@@ -119,7 +118,7 @@ module.exports = function(grunt) {
   grunt.registerTask('server-prod', [ 'shell' ]);
 
   grunt.registerTask('test', [
-    'jshint', 'mochaTest'
+    'mochaTest'
   ]);
 
   grunt.registerTask('build', [
@@ -134,6 +133,6 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('deploy', [ 'build', 'test', 'upload' ]);
+  grunt.registerTask('deploy', [ 'jshint', 'build', 'test', 'upload' ]);
 
 };
