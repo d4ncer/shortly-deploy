@@ -2,8 +2,19 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    concat: {
-    },
+      concat: {
+        options: {
+          separator: ';'
+        },
+        js: {
+          src: ['public/client/**/*.js'],
+          dest: 'public/dist/<%= pkg.name %>.js'
+        },
+        vendor: {
+          src: ['public/lib/jquery.js', 'public/lib/underscore.js', 'public/lib/**/*.js'],
+          dest: 'public/dist/vendors.js'
+        }
+      },
 
     mochaTest: {
       test: {
@@ -21,13 +32,18 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      dist: {
+        files: {
+          'public/dist/<%= pkg.name %>.min.js': ['<%= concat.js.dest %>'],
+          'public/dist/vendors.min.js': [ '<%= concat.vendor.dest %>' ]
+        }
+      }
     },
 
     jshint: {
-      files: [
-        // Add filespec list here
-      ],
+      files: ['Gruntfile.js', 'public/client/*.js'],
       options: {
+        reporter: require('jshint-stylish'),
         force: 'true',
         jshintrc: '.jshintrc',
         ignores: [
@@ -38,13 +54,18 @@ module.exports = function(grunt) {
     },
 
     cssmin: {
+      target: {
+        files: {
+          'public/dist/build.css' : [ 'public/style.css' ]
+        }
+      }
     },
 
     watch: {
       scripts: {
         files: [
           'public/client/**/*.js',
-          'public/lib/**/*.js',
+          'public/lib/**/*.js'
         ],
         tasks: [
           'concat',
@@ -59,8 +80,9 @@ module.exports = function(grunt) {
 
     shell: {
       prodServer: {
+        command: 'sh deploy.sh'
       }
-    },
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -89,24 +111,24 @@ module.exports = function(grunt) {
   // Main grunt tasks
   ////////////////////////////////////////////////////
 
+  grunt.registerTask('server-prod', [ 'shell' ]);
+
   grunt.registerTask('test', [
-    'mochaTest'
+    'jshint', 'mochaTest'
   ]);
 
   grunt.registerTask('build', [
+    'concat', 'uglify', 'cssmin'
   ]);
 
   grunt.registerTask('upload', function(n) {
     if(grunt.option('prod')) {
-      // add your production server task here
+      grunt.task.run([ 'server-prod' ]);
     } else {
       grunt.task.run([ 'server-dev' ]);
     }
   });
 
-  grunt.registerTask('deploy', [
-    // add your deploy tasks here
-  ]);
-
+  grunt.registerTask('deploy', [ 'build', 'test', 'upload' ]);
 
 };
