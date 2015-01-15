@@ -31,3 +31,10 @@ node_modules
 
 # WebStorm IDE
 .idea
+
+# Azure
+azure.err
+
+# Build
+public/dist/*.js
+public/dist/*.css
